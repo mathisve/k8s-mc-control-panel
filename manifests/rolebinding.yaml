@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mc-edit-rolebinding
+  namespace: mc
+subjects:
+- kind: ServiceAccount
+  name: mc-edit-sa
+  namespace: mc
+roleRef:
+  kind: Role
+  name: mc-edit-role
+  apiGroup: rbac.authorization.k8s.io

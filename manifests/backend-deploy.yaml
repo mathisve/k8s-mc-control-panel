@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: minecraft-control-panel-backend
+  name: minecraft-control-panel-backend
+  namespace: mc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecraft-control-panel-backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: minecraft-control-panel-backend
+    spec:
+      serviceAccountName: mc-edit-sa
+      imagePullSecrets:
+      - name: ecr-registry-secret
+      containers:
+      - image: 043039367084.dkr.ecr.us-east-1.amazonaws.com/minecraft-control-panel-backend:latest
+        imagePullPolicy: Always
+        name: minecraft-control-panel-backend
+        resources:
+          requests:
+            cpu: 20m
+            memory: 25Mi
+          limits:
+            cpu: 40m
+            memory: 50Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler

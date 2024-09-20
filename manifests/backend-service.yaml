@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minecraft-control-panel-backend
+  name: minecraft-control-panel
+  namespace: mc
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: minecraft-control-panel-backend
+  sessionAffinity: None
+  type: NodePort

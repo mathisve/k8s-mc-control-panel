@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mc-edit-role
+  namespace: mc
+rules:
+- apiGroups: ["apps"] # For deployments
+  resources: ["deployments"]
+  verbs: ["get", "list", "create", "update"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
