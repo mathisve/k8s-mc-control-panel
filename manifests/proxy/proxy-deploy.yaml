@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    reloader.stakater.com/auto: "true"
+  labels:
+    app: frontend-proxy
+  name: frontend-proxy
+  namespace: mc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-proxy
+  template:
+    metadata:
+      labels:
+        app: frontend-proxy
+    spec:
+      containers:
+      - image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
+      # - image: nginx
+        name: oauth2-proxy
+        command: ["oauth2-proxy"]
+        args: ["--config", "/oauth2-proxy/oauth2-proxy.cfg"]
+        resources:
+          requests:
+            cpu: 25m
+            memory: 25Mi
+          limits:
+            cpu: 30m
+            memory: 30Mi
+        ports:
+        - containerPort: 4180
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          readOnly: true
+          mountPath: /oauth2-proxy
+      volumes:
+      - name: config
+        secret:
+          secretName: frontend-proxy-config

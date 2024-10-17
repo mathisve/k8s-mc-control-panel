@@ -20,13 +20,15 @@ import (
 	"k8s.io/client-go/util/retry"
 )
 
-var NAMESPACE = "mc"
-var DEPLOYMENT_NAME = "mc"
-var IMAGE_NAME = "minecraft-server"
+const NAMESPACE = "mc"
+const DEPLOYMENT_NAME = "mc"
+const IMAGE_NAME = "minecraft-server"
 
 var deploymentClient appsv1.DeploymentInterface
 var podsClient v1.PodInterface
 var clientset *kubernetes.Clientset
+
+const authorizationToken = "Bearer b2xsaWUxMjMK"
 
 func main() {
 	fmt.Println("running backend control panel")
@@ -179,14 +181,33 @@ func handleRequests() {
 	mux.HandleFunc("/status", status)
 	mux.HandleFunc("/logs", getLogs)
 	log.Println("serving :80")
-	log.Fatal(http.ListenAndServe(":80", enableCors(mux)))
+	log.Fatal(http.ListenAndServe(":80", Authenticate(enableCors(mux))))
 }
 
 func enableCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST")
-		w.Header().Set("Access-Control-Allow-headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Origin", "https://mc-control-panel.homek8s.com")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent) // Respond with 204 No Content for preflight
+			return
+		}
+
+		// if r.Header.Get("Authorization") != authorizationToken {
+		// 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		// 	log.Printf("Unauthorized request: %#v\n", r)
+		// 	return
+		// }
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func Authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		next.ServeHTTP(w, r)
 	})
