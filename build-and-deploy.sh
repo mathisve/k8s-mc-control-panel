@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eou pipefail
+
 # Variables
 AWS_REGION="us-east-1" # e.g. us-east-1
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -29,7 +31,7 @@ echo "Building Docker images..."
 docker buildx build --platform linux/amd64 -t ${FRONTEND_REPO_NAME}:${FRONTEND_IMAGE_TAG} $FRONTEND_PATH --load
 
 # Backend image
-docker buildx build --platform linux/amd64 -t ${BACKEND_REPO_NAME}:${BACKEND_IMAGE_TAG} $BACKEND_PATH --load
+# docker buildx build --platform linux/amd64 -t ${BACKEND_REPO_NAME}:${BACKEND_IMAGE_TAG} $BACKEND_PATH --load
 
 # Tag the images for ECR
 echo "Tagging Docker images for ECR..."
@@ -47,6 +49,6 @@ echo "Pushing Docker images to ECR..."
 docker push ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO_NAME}:${FRONTEND_IMAGE_TAG}
 
 # Push backend
-docker push ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO_NAME}:${BACKEND_IMAGE_TAG}
+# docker push ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO_NAME}:${BACKEND_IMAGE_TAG}
 
 echo "Docker images successfully pushed to ECR!"

@@ -12,6 +12,9 @@ const textareaStyle = {
   fontSize: '16px', // Optional: Set the font size
 };
 
+const authorizationToken = "b2xsaWUxMjMK";
+const url="https://mc-control-panel.homek8s.com/api/"
+// const url="http://localhost:80/"
 
 function App() {
 
@@ -21,7 +24,12 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://192.168.86.230:31201/status');
+      const response = await axios.get(`${url}status`,  {
+        headers: {
+          'Authorization': `Bearer ${authorizationToken}`,
+          'Accept': `*/*`,
+        }
+      });
       setStatus(response.data);
 
       if (response.data === "started") {
@@ -38,7 +46,12 @@ function App() {
 
   const fetchLogs = async () => {
     try {
-      const response = await axios.get('http://192.168.86.230:31201/logs');
+      const response = await axios.get(`${url}logs`,  {
+        headers: {
+          'Authorization': `Bearer ${authorizationToken}`,
+          'Accept': `*/*`,
+        }
+      });
       if (response.data !== "\n") {
         setLogs(response.data);
       }
@@ -70,7 +83,12 @@ function App() {
   const startRequest = async () => {
     try {
       
-      const response = await axios.post('http://192.168.86.230:31201/start')
+      const response = await axios.post(`${url}start`,  {
+        headers: {
+          'Authorization': `Bearer ${authorizationToken}`,
+          'Accept': `*/*`,
+        }
+      });
 
       const result = await response.text();
       console.log(result.data);
@@ -83,7 +101,12 @@ function App() {
   const stopRequest = async () => {
     try {
       
-      const response = await axios.post('http://192.168.86.230:31201/stop')
+      const response = await axios.post(`${url}stop`,  {
+        headers: {
+          'Authorization': `Bearer ${authorizationToken}`,
+          'Accept': `*/*`,
+        }
+      });
 
       const result = await response.text();
       console.log(result.data);

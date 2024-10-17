@@ -3,14 +3,14 @@ kind: Service
 metadata:
   labels:
     app: minecraft-control-panel-backend
-  name: minecraft-control-panel
+  name: minecraft-control-panel-backend
   namespace: mc
 spec:
   ports:
-  - port: 8080
+  - port: 80
     protocol: TCP
     targetPort: 80
   selector:
     app: minecraft-control-panel-backend
   sessionAffinity: None
-  type: NodePort
+  type: ClusterIP
