@@ -123,8 +123,13 @@ func getPodLogs() (logs string, err error) {
 	log.Println("retrieving pod logs")
 	req := clientset.CoreV1().Pods(NAMESPACE).GetLogs(podName, &corev1.PodLogOptions{Container: containerName})
 	podLogs, err := req.Stream(context.TODO())
+
 	if err != nil {
-		return logs, err
+		if !strings.Contains(err.Error(), "is waiting to start") {
+			return logs, err
+		}
+
+		return logs, nil
 	}
 
 	defer podLogs.Close()
@@ -186,10 +191,11 @@ func handleRequests() {
 
 func enableCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "https://mc-control-panel.homek8s.com")
+		// w.Header().Set("Access-Control-Allow-Origin", "https://mc-control-panel.homek8s.com")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent) // Respond with 204 No Content for preflight
